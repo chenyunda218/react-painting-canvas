@@ -1,6 +1,6 @@
 enum PaintMode {
   NONE = "NONE",
   LINE = "LINE",
-  PEN = "PEN",
+  DRAW = "DRAW",
 }
 export default PaintMode;

@@ -9,70 +9,10 @@ import { Line } from "./types/Line";
 interface IProps {
   mode?: PaintMode;
   size: Size;
+  color: string;
 }
 
-function drawing(
-  startEvent: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
-  size: Size,
-  ctx: CanvasRenderingContext2D,
-  board: BoardType,
-  setBoard: React.Dispatch<React.SetStateAction<BoardType>>,
-  mode?: PaintMode
-) {
-  const offsetX = startEvent.nativeEvent.offsetX;
-  const offsetY = startEvent.nativeEvent.offsetY;
-  const startX = startEvent.screenX;
-  const startY = startEvent.screenY;
-  setBoard(
-    board.push(
-      new Line(
-        new Position(offsetX, offsetY),
-        new Position(
-          offsetX - (startX - startEvent.screenX),
-          offsetY - (startY - startEvent.screenY)
-        )
-      )
-    )
-  );
-  const remove = windowEventListener("mousemove", (e: MouseEvent) => {
-    switch (mode) {
-      case PaintMode.LINE:
-        setBoard(
-          board.push(
-            new Line(
-              new Position(offsetX, offsetY),
-              new Position(
-                offsetX - (startX - e.screenX),
-                offsetY - (startY - e.screenY)
-              )
-            )
-          )
-        );
-        break;
-      case PaintMode.PEN:
-        ctx.fillStyle = "blue";
-        ctx.fillRect(0, 0, size.width, size.height);
-        break;
-    }
-  });
-  const removeEnd = windowEventListener("mouseup", (e: MouseEvent) => {
-    setBoard(
-      board.push(
-        new Line(
-          new Position(offsetX, offsetY),
-          new Position(
-            offsetX - (startX - e.screenX),
-            offsetY - (startY - e.screenY)
-          )
-        )
-      )
-    );
-    remove();
-    removeEnd();
-  });
-}
-
-const Board: React.FC<IProps> = ({ mode, size }) => {
+const Board: React.FC<IProps> = ({ mode, size, color }) => {
   const [board, setBoard] = useState(
     new BoardType(new Size(500, 500), new Array())
   );
@@ -89,7 +29,18 @@ const Board: React.FC<IProps> = ({ mode, size }) => {
   const startDraw = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
       if (ctx) {
-        drawing(e, size, ctx, board, setBoard, mode);
+        board.startDraw(
+          e,
+          color,
+          mode,
+          (newBoard) => {
+            setBoard(newBoard);
+          },
+          (newBoard) => {
+            console.log("save");
+            setBoard(newBoard);
+          }
+        );
       } else {
         const _canvas = canvas.current;
         if (_canvas != null) {
