@@ -37,7 +37,6 @@ const Board: React.FC<IProps> = ({ mode, size, color }) => {
             setBoard(newBoard);
           },
           (newBoard) => {
-            console.log("save");
             setBoard(newBoard);
           }
         );
@@ -56,6 +55,9 @@ const Board: React.FC<IProps> = ({ mode, size, color }) => {
       case PaintMode.LINE:
         setCursor("crosshair");
         break;
+      case PaintMode.MOVE:
+        setCursor("move");
+        break;
       default:
         setCursor("");
     }
@@ -65,6 +67,9 @@ const Board: React.FC<IProps> = ({ mode, size, color }) => {
       board.draw(ctx);
     }
   }, [board]);
+  useEffect(() => {
+    setBoard(board.setSize(size));
+  }, [size]);
   return (
     <div className="App">
       <canvas
@@ -73,11 +78,11 @@ const Board: React.FC<IProps> = ({ mode, size, color }) => {
         style={{
           border: "5px solid red",
           cursor: cursor,
-          height: size.height,
-          width: size.width,
+          height: board.size.height,
+          width: board.size.width,
         }}
-        width={size.width}
-        height={size.height}></canvas>
+        width={board.size.width}
+        height={board.size.height}></canvas>
     </div>
   );
 };

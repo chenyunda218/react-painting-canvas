@@ -14,6 +14,9 @@ export class Position {
     this.x = x;
     this.y = y;
   }
+  move(vector: Vector): Position {
+    return new Position(this.x + vector.x, this.y + vector.y);
+  }
 }
 
 export class Vector {

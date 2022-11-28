@@ -1,4 +1,4 @@
-import { Size, Position } from "./Properties";
+import { Size, Position, Vector } from "./Properties";
 import { Line } from "./Line";
 import Action from "./Action";
 import PaintMode from "./PaintMode";
@@ -35,6 +35,14 @@ export default class Board {
     return new Board(this.size, actions, this.ctx);
   }
 
+  move(vector: Vector): Board {
+    return new Board(
+      this.size,
+      this.actions.map((a) => a.move(vector)),
+      this.ctx
+    );
+  }
+
   push(action: Action): Board {
     return this.setActions([...this.actions, action]);
   }
@@ -53,7 +61,27 @@ export default class Board {
       case PaintMode.DRAW:
         if (moveCB) this.drawDraw(startEvent, color, moveCB, endCB);
         break;
+      case PaintMode.MOVE:
+        if (moveCB) this.drawMove(startEvent, moveCB, endCB);
+        break;
     }
+  }
+
+  private drawMove(
+    startEvent: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
+    moveCB?: (board: Board) => void,
+    endCB?: (board: Board) => void
+  ) {
+    const startX = startEvent.screenX;
+    const startY = startEvent.screenY;
+    const remove = windowEventListener("mousemove", (ev) => {
+      moveCB!(this.move(new Vector(ev.screenX - startX, ev.screenY - startY)));
+    });
+    const removeEnd = windowEventListener("mouseup", (ev) => {
+      endCB!(this.move(new Vector(ev.screenX - startX, ev.screenY - startY)));
+      remove();
+      removeEnd();
+    });
   }
 
   private drawDraw(
@@ -141,5 +169,8 @@ export default class Board {
       remove();
       removeEnd();
     });
+  }
+  setSize(size: Size): Board {
+    return new Board(size, this.actions, this.ctx);
   }
 }
