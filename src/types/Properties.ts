@@ -19,6 +19,10 @@ export class Position {
   }
 }
 
+export interface Nib {
+  width: number;
+}
+
 export class Vector {
   x: number;
   y: number;
@@ -26,4 +30,11 @@ export class Vector {
     this.x = x;
     this.y = y;
   }
+}
+
+export interface Options {
+  color?: string;
+  alpha?: number;
+  nib?: Nib;
+  lineWidth?: number;
 }

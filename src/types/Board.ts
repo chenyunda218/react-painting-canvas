@@ -1,4 +1,4 @@
-import { Size, Position, Vector } from "./Properties";
+import { Size, Position, Vector, Options } from "./Properties";
 import { Line } from "./Line";
 import Action from "./Action";
 import PaintMode from "./PaintMode";
@@ -19,11 +19,11 @@ export default class Board {
     this.ctx = ctx;
   }
 
-  draw(ctx?: CanvasRenderingContext2D, color?: string) {
+  draw(ctx?: CanvasRenderingContext2D) {
     const _ctx = ctx || this.ctx;
     if (_ctx) {
       _ctx.clearRect(0, 0, this.size.width, this.size.height);
-      this.actions.forEach((action) => action.draw(_ctx, color));
+      this.actions.forEach((action) => action.draw(_ctx));
     }
   }
 
@@ -49,17 +49,17 @@ export default class Board {
 
   startDraw(
     startEvent: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
-    color: string,
+    options: Options,
     mode?: PaintMode,
     moveCB?: (board: Board) => void,
     endCB?: (board: Board) => void
   ) {
     switch (mode) {
       case PaintMode.LINE:
-        if (moveCB) this.drawLine(startEvent, color, moveCB, endCB);
+        if (moveCB) this.drawLine(startEvent, options, moveCB, endCB);
         break;
       case PaintMode.DRAW:
-        if (moveCB) this.drawDraw(startEvent, color, moveCB, endCB);
+        if (moveCB) this.drawDraw(startEvent, options, moveCB, endCB);
         break;
       case PaintMode.MOVE:
         if (moveCB) this.drawMove(startEvent, moveCB, endCB);
@@ -86,7 +86,7 @@ export default class Board {
 
   private drawDraw(
     startEvent: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
-    color: string,
+    options: Options,
     moveCB?: (board: Board) => void,
     endCB?: (board: Board) => void
   ) {
@@ -94,7 +94,7 @@ export default class Board {
     const offsetY = startEvent.nativeEvent.offsetY;
     const startX = startEvent.screenX;
     const startY = startEvent.screenY;
-    const draw = new Draw([new Position(offsetX, offsetY)], color);
+    const draw = new Draw([new Position(offsetX, offsetY)], options);
     const remove = windowEventListener("mousemove", (ev) => {
       draw.push(
         new Position(
@@ -119,7 +119,7 @@ export default class Board {
 
   private drawLine(
     startEvent: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
-    color: string,
+    options: Options,
     moveCB?: (board: Board) => void,
     endCB?: (board: Board) => void
   ) {
@@ -135,7 +135,7 @@ export default class Board {
             offsetX - (startX - startEvent.screenX),
             offsetY - (startY - startEvent.screenY)
           ),
-          color
+          options
         )
       )
     );
@@ -148,7 +148,7 @@ export default class Board {
               offsetX - (startX - ev.screenX),
               offsetY - (startY - ev.screenY)
             ),
-            color
+            options
           )
         )
       );
@@ -162,7 +162,7 @@ export default class Board {
               offsetX - (startX - ev.screenX),
               offsetY - (startY - ev.screenY)
             ),
-            color
+            options
           )
         )
       );

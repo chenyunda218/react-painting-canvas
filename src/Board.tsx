@@ -10,9 +10,11 @@ interface IProps {
   mode?: PaintMode;
   size: Size;
   color: string;
+  alpha: number;
+  lineWidth: number;
 }
 
-const Board: React.FC<IProps> = ({ mode, size, color }) => {
+const Board: React.FC<IProps> = ({ mode, size, color, alpha, lineWidth }) => {
   const [board, setBoard] = useState(
     new BoardType(new Size(500, 500), new Array())
   );
@@ -31,7 +33,7 @@ const Board: React.FC<IProps> = ({ mode, size, color }) => {
       if (ctx) {
         board.startDraw(
           e,
-          color,
+          { color, alpha, lineWidth },
           mode,
           (newBoard) => {
             setBoard(newBoard);
